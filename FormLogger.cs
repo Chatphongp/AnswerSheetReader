@@ -23,5 +23,14 @@ namespace AnswerSheetReader
             log.Items.Add(new ListViewItem(row));
             log.Items[log.Items.Count - 1].EnsureVisible();
         }
+
+        public void addError(string m)
+        {
+            string[] row = { DateTime.Now.ToString("HH:mm:ss tt"), m };
+            ListViewItem li = new ListViewItem(row);
+            li.ForeColor = Color.Red;
+            log.Items.Add(li);
+            log.Items[log.Items.Count - 1].EnsureVisible();
+        }
     }
 }

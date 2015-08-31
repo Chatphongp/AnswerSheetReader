@@ -12,11 +12,26 @@ namespace AnswerSheetReader
 {
     public partial class FormSheet : Form
     {
-        public Boolean isLoaded { get; set; } 
+        public Boolean isLoaded { get; set; }
+        public string dirPath { get; set; }
+        private string path = "C:\\Users\\Chadpong\\Desktop\\5635_Answer Sheet - Copy\\Answer Sheet\\100\\JPEG File";
 
         public FormSheet()
         {
-            InitializeComponent();            
+            InitializeComponent();        
+            
+            string[] files = Directory.GetFiles(path, "*.jpg");
+            if (files.Length > 0)
+                {
+                    foreach (string s in files)
+                    {
+                        fileList.Items.Add(new ListViewItem(s));
+                    }
+                    fileList.Items[fileList.Items.Count - 1].EnsureVisible();
+
+                    this.sheetsStatus.Text = files.Length + " sheet(s) loaded.";
+                    this.isLoaded = true;
+                }
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -26,7 +41,9 @@ namespace AnswerSheetReader
 
             if (folder.ShowDialog() == DialogResult.OK)
             {
-                string[] files = Directory.GetFiles(folder.SelectedPath);
+                dirPath = folder.SelectedPath;
+
+                string[] files = Directory.GetFiles(folder.SelectedPath, "*.jpg");
 
                 if (files.Length > 0)
                 {
@@ -50,6 +67,16 @@ namespace AnswerSheetReader
         {
             fileList.Items.Clear();
             this.sheetsStatus.Text = "0 file(s) loaded.";
+        }
+
+        public List<String> getFiles()
+        {
+            List<String> l = new List<String>();
+            foreach (ListViewItem item in fileList.Items)
+            {
+                l.Add(item.Text);
+            }
+            return l;
         }
     }
 }

@@ -26,3 +26,5 @@ c:\users\chadpong\documents\visual studio 2012\Projects\AnswerSheetReader\Answer
 c:\users\chadpong\documents\visual studio 2012\Projects\AnswerSheetReader\AnswerSheetReader\bin\Debug\Emgu.Util.xml
 c:\users\chadpong\documents\visual studio 2012\Projects\AnswerSheetReader\AnswerSheetReader\bin\Debug\AForge.Math.xml
 c:\users\chadpong\documents\visual studio 2012\Projects\AnswerSheetReader\AnswerSheetReader\obj\Debug\AnswerSheetReader.csprojResolveAssemblyReference.cache
+C:\Users\Chadpong\documents\visual studio 2012\Projects\AnswerSheetReader\AnswerSheetReader\obj\Debug\AnswerSheetReader.FormConfig.resources
+C:\Users\Chadpong\documents\visual studio 2012\Projects\AnswerSheetReader\AnswerSheetReader\obj\Debug\AnswerSheetReader.Class.FormResult.resources

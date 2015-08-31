@@ -11,6 +11,7 @@ using AnswerSheetReader.Class;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Diagnostics;
+using System.IO;
 
 namespace AnswerSheetReader
 {
@@ -18,6 +19,9 @@ namespace AnswerSheetReader
     {
         FormLogger logger;
         FormSheet sheets;
+        FormConfig config;
+        FormResult result;
+
         public FormMain()
         {
             InitializeComponent();
@@ -28,59 +32,93 @@ namespace AnswerSheetReader
             logger = new FormLogger();
             logger.MdiParent = this;
             logger.Show();
-            logger.Location = new Point(this.Width - logger.Width - 30, this.Height - logger.Height - 50);
+            logger.Location = new Point(this.Width - logger.Width - 30, this.Height - logger.Height - 70);
 
             sheets = new FormSheet();
             sheets.MdiParent = this;
             sheets.Show();
-            sheets.Location = new Point(this.Width - sheets.Width - 30, this.Height - logger.Height - sheets.Height - 70);
+            sheets.Location = new Point(this.Width - sheets.Width - 30, this.Height - logger.Height - sheets.Height - 90);
 
-            logger.addLog("Started.");
+            result = new FormResult();
+            result.MdiParent = this;
+            result.Show();
+            result.Location = new Point(10, 20);
+
+            logger.addLog("Initialized.");
         }
 
-        private void test()
+        private void executeMenuStrip_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 10; i++)
+            List<String> files = sheets.getFiles();
+            if (files.Count > 0)
             {
-                Thread.Sleep(1000);
-                this.Invoke((MethodInvoker)delegate
-                {
-                    logger.addLog(i.ToString());
-                });
+                logger.addLog("Start Processing " + files.Count + " file(s).");
+                Thread thread = new Thread(() => LongRun(files));
+                thread.Start();
+            }
+            else
+            {
+                logger.addError("No file selected.");
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            ImageUtils utils = new ImageUtils();
-            Thread thread = new Thread(LongRun);
-
-            thread.Start();
-        }
-
-        private void LongRun()
-        {
-            ImageUtils utils = new ImageUtils();
+        private void LongRun(List<String> files)
+        {            
             Stopwatch w = new Stopwatch();
             w.Start();
-            for (int i = 0; i < 100; i++)
-            {
 
-                utils.originalImage = new Image<Bgr, byte>("C:\\Users\\Chadpong\\Desktop\\Answer sheet\\max.jpg");
-                utils.DeSkew(i);
+            int count = 0;            
+            foreach (String file in files)
+            {
+                ImageUtils imgUtils = new ImageUtils(new Image<Bgr, byte>(file));
+
+                int corner = imgUtils.FindCorner();
+                imgUtils.PerspectiveTransform("C:\\Users\\Chadpong\\Desktop\\output\\" + count + ".jpg");
+                //imgUtils.PerspectiveTransform("C:\\Users\\Chadpong\\Desktop\\output\\" + count + ".jpg");
+                //imgUtils.DeSkew();
+                //imgUtils.Validate();
+
+                string appId = Utils.GetApplicantID(imgUtils.ReadAppicantId());
+                
                 this.Invoke((MethodInvoker)delegate
                 {
-                    logger.addLog(i.ToString());
-                });
+                    if (appId.Contains('X'))
+                    {
+                        result.addErrorResult(Path.GetFileName(file), appId);
+                    }
+                    else
+                    {
+                        result.addResult(Path.GetFileName(file), appId);
+                    }
 
+                    logger.addLog(corner.ToString());
+
+                });
+                count++;
+                imgUtils = null;
             }
 
             this.Invoke((MethodInvoker)delegate
             {
                 logger.addLog("Process completed in " + Utils.toReadableString(w.ElapsedMilliseconds));
             });
-            
         }
 
+        private void configToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (config != null)
+            {
+                if (!config.Visible)
+                {
+                    config.Show();
+                }
+            }
+            else
+            {
+                config = new FormConfig();
+                config.MdiParent = this;
+                config.Show();
+            }
+        }
     }
 }
